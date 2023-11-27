@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rugii913 TIL</title>
+</head>
+
+<body>
+    <h2>rugii913의 TIL</h2>
+    <h3>20231127 TIL</h3>
+    <div>작성일시: 2023-11-27 20:39</div>
+    <!-- <div>수정일시: 2023-11-27 20:39</div> -->
+    <ul>
+        <li>
+            <span>팀 페이지 wireframe 만들기 - Figma 이용</span>
+            <ul>
+                <li>
+                    <span>***(느낀 점)단지 wireframe이라고 생각했는데, 예상 외의 부분에서 팀원들이 내가 그림으로 의도했던 바와 다르게 생각하는 부분이 있어서 놀랐음</span>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <span>REST API 설계 기초적인 내용 살펴보기</span>
+            <ul>
+                <li>
+                    <div>***(의문점)등록 수정 등을 위한 html form 파일을 RESTful API로 가져올 수 있는가?</div>
+                    <div>=> 수정 요청 POST /member/{memberId}</div>
+                    <div>==> 그런데 수정 요청을 하기 위한 form의 HTTP 메서드 및 URI는? GET /member/update/{memberId}</div>
+                    <div>===> ??? form이라는 자원을 얻는 것에 대해 URI에 update 같은 행위를 안 넣을 수 있는가?</div>
+                    <div>===> ??? GET /member-create-form/{memberId} /member-update-form/{memberId} 이런 식으로 들어가야 하나?</div>
+                </li>
+                <li>
+                    <div>REST API 디자인 가이드 핵심 사항</div>
+                    <div>1. URI는 정보의 자원을 표현해야 한다. ex. 회원, 게시글</div>
+                    <div>2. 자원에 대한 행위는 HTTP 메서드로 표현한다.</div>
+                    <div>(x) URI에 행위를 넣기</div>
+                    <div>(x) 마지막 문자로 슬래시(/) 포함</div>
+                    <div>(x) URI에 밑줄 시용(밑줄 대신 하이픈 - 사용 해야함, 이것도 불가피한 경우만)</div>
+                    <div>(x) URI에 대문자 사용</div>
+                    <div>(x) URI에 파일 확장자 포함 ex. /member/{memberId}/profile.jpg</div>
+                </li>
+                <li>
+                    <div>HTTP method의 종류</div>
+                    <div>GET 조회, </div>
+                </li>
+                <li>
+                    <div>참고 링크</div>
+                    <div><a href="https://velog.io/@couchcoding/개발-초보를-위한-RESTful-API-설계-가이드">Velog @couchcoding 개발-초보를-위한-RESTful-API-설계-가이드</a></div>
+                    <div><a href="https://velog.io/@city7310/백엔드가-이정도는-해줘야-함-4.-API-설계-원칙과-직렬화-포맷-결정">Velog @city7310 백엔드가-이정도는-해줘야-함-4.-API-설계-원칙과-직렬화-포맷-결정</a></div>
+                    <div><a href="https://www.youtube.com/watch?v=PmY3dWcCxXI">(유튜브 생활코딩) 기계들의 대화법 - REST API</a></div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <a href="/">뒤로 가기</a>
+</body>
+
+</html>

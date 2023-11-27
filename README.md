@@ -1,4 +1,5 @@
-### Hi there 👋
+### Hi 👋
+- This is rugii913's Profile.
 
 <!--
 **rugii913/rugii913** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
