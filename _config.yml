@@ -1,5 +1,9 @@
 # The Site Configuration
 
+# js 파일 관련 https://velog.io/@lzlko/github-%EB%B8%94%EB%A1%9C%EA%B7%B8
+include:
+ - _javascript
+
 # Import the theme
 theme: jekyll-theme-chirpy
 

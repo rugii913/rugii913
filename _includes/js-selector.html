@@ -65,8 +65,10 @@
     {% assign js = 'commons' %}
 {% endcase %}
 
-{% capture script %}/assets/js/dist/{{ js }}.min.js{% endcapture %}
+
+{% capture script %}assets/js/dist/{{ js }}.min.js{% endcapture %}
 <script defer src="{{ script | relative_url }}"></script>
+<!-- cf. 위 {% capture script %}assets/js/dist/{{ js }}.min.js{% endcapture %}는 원래 /assets/js/...이었음 -->
 
 {% if page.math %}
   <!-- MathJax -->

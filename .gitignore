@@ -19,4 +19,5 @@ package-lock.json
 .vscode
 
 # Misc
-assets/js/dist
+# assets/js/dist
+# js 파일 문제 관련 https://github.com/cotes2020/jekyll-theme-chirpy/issues/1090
