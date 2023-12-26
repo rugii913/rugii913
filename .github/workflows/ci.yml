@@ -30,8 +30,9 @@ jobs:
         #https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
         #https://docs.github.com/ko/github-ae@latest/actions/automating-builds-and-tests/building-and-testing-ruby
         with:
-          ruby-version: 3
+          ruby-version: '3.1'
           bundler-cache: true
+          cache-version: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
