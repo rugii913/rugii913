@@ -218,7 +218,6 @@ render_with_liquid: false
   - Spring Security filter chain 리팩토링
     - CORS 설정 리팩토링
     - 프로파일에 따라 다른 filter chain 구성, 스프링 액추에이터 요청 포트 은닉
-  - SocialUser 엔티티에 userLink 프로퍼티 추가, userId를 body에 갖고 있는 DTO 수정
   - 기타 API 리팩토링
     - userLink로 프로필 받아오는 API 추가
     - FollowDetailResponse DTO에서 non-nullable인 프로퍼티를 nullable로 수정: 이미지 url, 자기소개
@@ -246,6 +245,7 @@ render_with_liquid: false
 - 리팩토링
   - 알림 SSE 오류 분석 및 해결: 프론트엔드 업무와도 연관
   - 분산락 적용 시 트랜잭션과 얽히는 부분 리팩토링
+  - SocialUser 엔티티에 userLink 프로퍼티 추가, userId를 body에 갖고 있는 DTO 수정
 - 인프라
   - 테스트 환경 embedded redis 설정(서브 업무 중 환경 변수 노출 방지 및 스프링 부트 설정 관리 관련)
   - 백엔드 배포 스크립트를 실행 환경에 따른 분리하는 작업 중 트러블 해결
@@ -254,5 +254,5 @@ render_with_liquid: false
   - 모니터링 이후 인프라 변경 결정
 - 화면 및 프론트엔드
   - 프론트엔드 코드 작성 중 느낀 API 명세의 중요성, 백엔드-프론트엔드의 협업 필요성: 요청해서 변경한 코드도 있고, 시간 관계 상 직접 변경한 코드도 있음
-  - 프론트에 노출되는 프로퍼티 변경 필요성 userId → userLink
+  - 프론트에 노출되는 프로퍼티 변경 필요성 userId → userLink(리팩토링 부분과 연관)
 
