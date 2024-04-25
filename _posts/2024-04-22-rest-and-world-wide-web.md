@@ -7,7 +7,7 @@ tags: [network, REST]
 render_with_liquid: false
 ---
 
-- **\"제목은 REST와 World Wide Web으로 하겠습니다. 그런데 이제 REST API를 곁들인...\"**라는 제목으로 발표한 내용과 스터디에서 나왔던 이야기들을 정리한 글입니다.
+- **K-DEVCON 대전 2024년 4월 20일 오프라인 스터디 중 \"제목은 REST와 World Wide Web으로 하겠습니다. 그런데 이제 REST API를 곁들인...\"**라는 제목으로 발표한 내용 및 논의된 이야기들을 정리+추후 보완한 글입니다.
 
 - 사실이 아닌 주관적인 생각, 의견, 인상 비평도 일부 있을 수 있습니다.
   - 틀린 내용 반박 환영합니다. rugii913@gmail.com
@@ -18,21 +18,27 @@ render_with_liquid: false
 목차 열어보기
 </summary>
 <div markdown="1">
-- 1. 참고 자료
-- 2. 결론(...?)
-- 3. REST (스타일을 참고한 HTTP 기반) API(라고 통상적으로 불리는 것의) 설계 가이드
-- 4. API 비교: REST API - SOAP - RPC
-- 5. REST 관련 용어 및 기반 개념 살펴보기
-- 6. REST의 시작: Architectural Styles and the Design of Network-based Software Architectures
-- 7. 정말로 REST API를 만들고 싶다면...: 웹 vs. 웹 API: 의미적 차이라는 제약 조건
-- 8. Richardson Maturity Model: REST 제약 조건 관점의 웹 서비스 성숙도 모델
-- 9. 결론
+- 0 들어가기에 앞서
+- 1 참고 자료
+- 2 결론(...?)
+- 3 REST (스타일을 참고한 HTTP 기반) API(라고 통상적으로 불리는 것의) 설계 가이드
+- 4 API 비교: REST API - SOAP - RPC
+- 5 REST 관련 용어 및 기반 개념 살펴보기
+- 6 REST의 시작: Architectural Styles and the Design of Network-based Software Architectures
+- 7 정말로 REST API를 만들고 싶다면...: 웹 vs. 웹 API: 의미적 차이라는 제약 조건
+- 8 Richardson Maturity Model: REST 제약 조건 관점의 웹 서비스 성숙도 모델
+- 9 결론
 </div>
 </details>
 
 ---
 
-## 들어가기에 앞서
+## 0 들어가기에 앞서
+<details>
+<summary>
+들어가기에 앞서 열어보기
+</summary>
+<div markdown="1">
 - 처음에 이 주제로 발표를 해야겠다고 생각했을 때는
   - \"3. REST (스타일을 참고한 HTTP 기반) API(라고 통상적으로 불리는 것의) 설계 가이드\" 이 부분을 중점적으로 공부해야하지 않을까 생각했었다.
   - 로이 필딩의 논문을 읽어보려고 시도하고, 요약본을 대강 찾아보긴 했지만 대충 훑어보고 그런가보다 하고 넘겼다.
@@ -49,7 +55,7 @@ render_with_liquid: false
   - Spring의 @RestController 같은 것 때문에 REST API를 오해하고 있었던 지점도 있었다.
   - @RestController는 HTML 웹 페이지가 아니라 JSON을 반환하니까 JSON을 반환하면 REST API인가보다 하는 그런 순진한 생각 같은 것...
 
-### (1)-(1) Spring의 @Controller와 @RestController
+### 0-1-1 Spring의 @Controller와 @RestController에 대한 생각
 - @RestController는 간단히 말하면 @RequestMapping에 @ResponseBody를 붙여주는 역할을 한다.
   - 이로 인해 DispatcherServlet에서는 요청의 Accept 헤더를 확인 후 응답 객체를 MessageConverter를 통해 적절한 미디어 타입으로 변환 후 내보낸다.
     - 만약 @RestController가 아니라 @Controller라면 뷰 리졸버를 거쳐 프로젝트 내에서 해당하는 이름을 갖는 뷰 파일을 찾으려고 할 것이다.
@@ -63,14 +69,16 @@ render_with_liquid: false
 - 즉 @RestController는 엔드포인트를 REST API의 엔드포인트로 만들어준다기보다는
   - HTTP 명세를 지킬 수 있는 API의 엔드포인트로 만들어준다고 표현하면 되지 않을까 싶다.
 
-### (1)-(2) API가 HTML을 응답해도 상관 없다.
-- <https://stackoverflow.com/questions/28480785/rest-api-why-no-html-instead-of-json>
-- <https://softwareengineering.stackexchange.com/questions/207835/is-it-ok-to-return-html-from-a-json-api>
-- 다만 응답을 받는 쪽에서 파싱하기 까다로워질 뿐
+### 0-1-2 API가 HTML을 응답해도 상관 없다.
+- 다만 응답을 받는 기계가 파싱하기 까다로워질 뿐
+  - <https://stackoverflow.com/questions/28480785/rest-api-why-no-html-instead-of-json>
+  - <https://softwareengineering.stackexchange.com/questions/207835/is-it-ok-to-return-html-from-a-json-api>
+  - API가 HTML 문서를 준다는 것은 사람에게 전달할 웹 페이지로서의 HTML 문서를 주는 것이 아니라는 점을 인식해야한다.
 
-### (2) REST API가 유행어로 번진 이유에 대한 개인적인 생각
+### 0-2 REST API가 유행어로 번진 이유에 대한 개인적인 생각
 - 20일 발표 때 K-DEVCON 강성욱 멘토님께서 얘기하셨듯 REST API의 유행 배경에는 마이크로서비스 아키텍처의 대두가 있었던 것 같다.
   - <https://devopedia.org/application-programming-interface> 여기서도 이를 지적하고 있다.
+
 - 하지만 MSA가 아닌 모놀리식 아키텍처를 사용하는 서비스에서는 REST API를 사용할 필요가 없는가?
   - 모놀리식 아키텍처에서 REST API를 사용할 필요가 없다면 왜 조그만 서비스를 제작할 때도 REST API를 말하는 사람들이 있는가?
   - 왜 MSA와는 상관도 없는 아키텍처를 가진 서비스에서 자꾸 자기들은 REST API를 사용한다고 주장하는 걸까?
@@ -85,9 +93,11 @@ render_with_liquid: false
     - 우리도 HTTP 명세 잘 준수하잖아?
     - 그러면 우리 API도 REST API네!
     - 이런 흐름일까...?
+
 -  정말로 개인적인 생각일 뿐이지만, 단순히 클라이언트 사이드 렌더링을 위해 API 서버의 API가 REST할 필요는 거의 없다고 생각한다.
   - 같은 회사 내의 프론트-백끼리 소통이 잘 되면 된다.
   - 빠른 개발을 할 때 REST 제약 조건을 신경 쓰는 것은 오히려 독일 수도 있을 것 같다.
+
 - 만약 MSA를 사용하여 각 컴포넌트끼리 호출해야하는 상황이라면 REST 제약 조건의 필요성이 있지 않을까 생각은 들지만 잘 모르겠다.
   - 직접 MSA를 개발하고 사용해봐야 알 것 같다.
 
@@ -99,12 +109,14 @@ render_with_liquid: false
   - 모놀리식 구조라면 굳이 REST 제약 조건에 집착할 필요성은 적은 것 같다. 물론 여력이 있다면 신경쓸 수도 있겠지만.
   - 모놀리식 구조더라도 불특정 다수의 통제할 수 없는 클라이언트들이 있다면 REST 제약 조건 준수를 생각해볼 필요가 있을 것 같다.
 - **정말 마지막으로 정리하자면 서비스의 규모가 작고, 모놀리식 구조이고, 클라이언트가 프론트 애플리케이션 하나밖에 없다면 REST는 생각하지 않는 게 나은 것 같다.**
+</div>
+</details>
 
 ---
 
-## 1. 참고 자료
+## 1 참고 자료
 
-### 주요 참고 자료
+### 1-1 주요 참고 자료
 - [Fielding, Roy Thomas, Architectural Styles and the Design of Network-based Software Architectures. Doctoral dissertation, 2000](https://ics.uci.edu/~fielding/pubs/dissertation/top.htm)
 
 - [RESTful Web API 웹 API를 위한 모범 전략 가이드, 레오나르드 리처드슨 외 3인, 2015](https://product.kyobobook.co.kr/detail/S000001033018)
@@ -112,7 +124,7 @@ render_with_liquid: false
 
 - [Day1, 2-2. 그런 REST API로 괜찮은가, 유튜브 NAVER D2 채널, 2017.11.20.](https://youtu.be/RP_f5dMoHFc?si=A8t7BbqP3XkQ8Mes)
 
-### HTTP 관련 명세
+### 1-2 HTTP 관련 명세
 - [RFC 1738 Uniform Resource Locators\(URL\)](https://datatracker.ietf.org/doc/html/rfc1738)
 - [RFC 2616 Hypertext Transfer Protocol -- HTTP/1.1](https://datatracker.ietf.org/doc/html/rfc2616)
   - 개정 이전인 RFC 2068이 1997년에 나왔지만 보통 1999년의 RFC 2616을 HTTP/1.1로 부르는 듯하다.
@@ -129,7 +141,7 @@ render_with_liquid: false
 - [RFC 5741 RFC Streams, Headers, and Boilerplates](https://datatracker.ietf.org/doc/html/rfc5741)
   - RFC 자체에 대한 내용인 듯하다.
 
-### 그 밖의 참고 내용
+### 1-3 그 밖의 참고 내용
 #### 로이 필딩 2000년 박사 논문 관련
 - 네이버 블로그 Do :: At one's fingertips_ 중 Roy Fielding 의 REST API 논문 번역 및 이해 시리즈 및 관련 글
   - [\[REST API\] Roy Fielding 의 REST API 논문 번역 및 이해\(1\)](https://m.blog.naver.com/aservmz/222234406469)
@@ -146,15 +158,15 @@ render_with_liquid: false
 
 ---
 
-## 2. 결론(...?)
-### REST API 만들지 마세요
+## 2 결론(...?)
+### 2-1 REST API 만들지 마세요
 - HTTP API를 굳이 REST하게 만들 필요가 있을까?
   - 자료를 찾아보면서 절실히 느꼈던 점이었다.
   - 엔드포인트 이름을 지을 때 리소스를 고려한다든지, HTTP 명세를 잘 준수한다든지 이런 건 지키면 대개 좋을 것 같다는 느낌적인 느낌이 있다.
   - 하지만 REST API가 정말 REST 하려면 지켜야하는 self-descriptive나 HATEOAS가 정말로 많은 서비스에 필요할까?
     - 굳이 필요하지 않다는 게 내 개인적의 의견이다.
 
-### don't waste youre time arguing about REST
+### 2-2 don't waste youre time arguing about REST
 - 로이 필딩은 2008년에 자신의 블로그의 [REST APIs must be hypertext-driven](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven)라는 글에 다음과 같이 적었다.
   - Please try to adhere to them or choose some other buzzword for your API.
   - 위에서 them는 하이퍼텍스트 제약조건을 말한다.
@@ -168,20 +180,20 @@ render_with_liquid: false
   - 그렇다면 REST 개념을 몰라도 될까?
   - 더욱이 내가 일하는 회사의 API에 REST 제약 조건이 필요하지 않다면 REST 같은 건 신경쓰지 않아도 되는 걸까?
 
-### JSON 상하차 인력이 되지 않으려면
+### 2-3 웹개발을 하면서 JSON 상하차 인력이 되지 않으려면
 - 물론 신입 개발자에게 JSON 요청 받기 응답 하기 외의 다른 일을 할 선택권 자체가 없을 수 있겠다만...
   - 그래도 더 넓은 시야로 웹 개발을 바라보면 좋지 않을까 생각이 든다.
 - 국비 캠프에 참여하면서 훈련생들이 뭔가 근본적인 것을 놓치고 있다는 생각이 들 때가 있었다.
   - 요청 받고 요청에 따라 DB에서 데이터 꺼내서 적절히 처리한 후 잘 내보내긴 하는데...
   - 그런데 그 다음은...?
   - 물론 캠프의 커리큘럼 문제일 수도 있겠다만...
-- 웹 서비스가 자체가 근본적으로 분산 시스템이라는 것
-  - 특히 분산 하이퍼미디어 시스템이라는 것
-  - 웹의 역사를 살펴봤을 때 웹의 핵심은 하이퍼미디어(혹은 하이퍼텍스트)라는 것을 아는 것은 확실히 웹을 바라보는 데에 도움이 되지 않을까 한다.
+- 웹이라는 시스템 자체가 근본적으로 분산 시스템이라는 것, 따라서 웹 서비스 역시 분산 시스템일 수밖에 없다는 것
+  - 특히 분산 **하이퍼미디어** 시스템이라는 것
+  - 웹의 역사를 살펴봤을 때 **웹의 핵심은 하이퍼미디어(혹은 하이퍼텍스트)**라는 것을 아는 것은 확실히 웹을 바라보는 데에 도움이 되지 않을까 한다.
 
 ---
 
-## 3. REST (스타일을 참고한 HTTP 기반) API(라고 통상적으로 불리는 것의) 설계 가이드
+## 3 REST (스타일을 참고한 HTTP 기반) API(라고 통상적으로 불리는 것의) 설계 가이드
 
 - 통상적으로 REST API라고 불리(지만 사실은 REST 제약 조건을 만족하지 않)는 API를 설계할 때는 다음의 두 가지를 생각하면 될 것 같다.
   - 리소스 개념을 고려한 엔드포인트 이름 짓기
@@ -192,7 +204,7 @@ render_with_liquid: false
   - [REST API란 무엇인가](https://tech.trenbe.com/2022/01/16/rest-api.html) - 트렌비 기술 블로그
 - 그리고 이는 Richardson Maturity Model의 Level 2에 해당하는 수준이라 보면 될 것 같다.
 
-### 리소스 개념을 고려한 엔드포인트 이름 짓기
+### 3-1 리소스 개념을 고려한 엔드포인트 이름 짓기
 \*resource의 정의에 대해서는 "5. REST 관련 용어 및 기반 개념 살펴보기"에서 훑어볼 것이다.
 <br/>
 #### URL(Uniform Resource Locators)이란?
@@ -278,13 +290,13 @@ render_with_liquid: false
     - 하지만 이는 추후 살펴볼 REST 제약 조건 중 stateless 제약 조건을 위반하는 듯하다. 좀 더 고민이 필요할 것 같다.
   - 결국 리소스를 고려하기보다는 관습을 인정하고 POST /sign-up, POST /login, POST /logout 등을 사용하는 것이 나은 선택이라 생각한다.
 
-### HTTP 메서드 관련 명세 준수
+### 3-2 HTTP 메서드 관련 명세 준수
 
-### 하지만 로이 필딩은...
+### 3-3 하지만 로이 필딩은...
 
 ---
 
-## 4. API 비교 - REST(REpresentational state transfer) - RPC(Remote Procedure Call) - SOAP(Simple Object Access Protocol)
+## 4 API 비교 - REST(REpresentational state transfer) - RPC(Remote Procedure Call) - SOAP(Simple Object Access Protocol)
 
 - 인터페이스
   - interface, surface, face
@@ -302,7 +314,7 @@ render_with_liquid: false
 
 ---
 
-## 5. REST 관련 용어 및 기반 개념 살펴보기
+## 5 REST 관련 용어 및 기반 개념 살펴보기
 - 웹 = 월드 와이드 웹
   - 웹 서비스
   - 네트워크: 그 인프라 / 키워드: 종단 시스템, ...
@@ -339,7 +351,7 @@ render_with_liquid: false
 
 ---
 
-## 6. REST의 시작: Architectural Styles and the Design of Network-based Software Architectures
+## 6 REST의 시작: Architectural Styles and the Design of Network-based Software Architectures
 
 ### REST라는 용어: REpresentational State Transfer
 
@@ -365,17 +377,17 @@ render_with_liquid: false
 
 ---
 
-## 7. 정말로 REST API를 만들고 싶다면...: 웹 vs. 웹 API: 의미적 차이라는 제약 조건
+## 7 정말로 REST API를 만들고 싶다면...: 웹 vs. 웹 API: 의미적 차이라는 제약 조건
 
 ---
 
-## 8. Richardson Maturity Model: REST 제약 조건 관점의 웹 서비스 성숙도 모델
+## 8 Richardson Maturity Model: REST 제약 조건 관점의 웹 서비스 성숙도 모델
 
 ---
 
-## 9. 결론
-### 결론 - 로이 필딩 2015년 발표 자료의 말 다시 보기
+## 9 결론
+### 9-1 결론 - 로이 필딩 2015년 발표 자료의 말 다시 보기
 
-### 그러면 면접에서 REST API에 대해 물어보면 뭐라고 답해야 할까?
+### 9-2 그러면 면접에서 REST API에 대해 물어보면 뭐라고 답해야 할까?
 
 ---
