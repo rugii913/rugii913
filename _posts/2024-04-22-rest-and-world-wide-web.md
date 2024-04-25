@@ -194,6 +194,89 @@ render_with_liquid: false
 
 ### 리소스 개념을 고려한 엔드포인트 이름 짓기
 \*resource의 정의에 대해서는 "5. REST 관련 용어 및 기반 개념 살펴보기"에서 훑어볼 것이다.
+<br/>
+#### URL(Uniform Resource Locators)이란?
+- URL은 서비스의 resource에 접근하기 위한 방법이다.
+  - 즉 URL이 서비스 리소스에 대한 인지모델을 형성한다.
+- ex. \[통신 프로토콜\(http/https\)를 포함한 origin\]/\[service-root\]/\[resource-collection\]/\[resource-id\]
+  - 위에서 \[통신 프로토콜\(http/https\)를 포함한 origin\] 뒤의 "/" 부터 해당 서비스에서의 URL이다.
+  - service-root: 서비스를 명시하는 path
+  - resource-collection: 리소스의 collection, 복수형으로 작성
+  - resource-id: 리소스 컬렉션에서의 리소스의 id
+
+#### 엔드포인트 이름 규칙
+\* 아래는 주로 [트렌비 기술 블로그 - REST API란 무엇인가](https://tech.trenbe.com/2022/01/16/rest-api.html)를 참고한 내용이다.
+- 기본적으로 소문자를 사용(URL은 case sensitive임)
+- 언더바(_) 대신 하이픈(-)을 사용
+  - 링크로 들어갈 경우 밑줄과 언더바가 헷갈린다.
+- 마지막에는 슬래시를 포함하지 않음
+  - 슬래시는 계층을 구분할 때 사용하는 것임
+- 행위(verb)는 URL에 포함하지 않음
+  - 행위, 작업에 대한 것은 URL이 아닌 HTTP 메서드를 사용하여 나타낸다.
+- 파일 확장자는 URL에 포함하지 않음
+- Control Resoruce의 경우 동사 형태를 허용
+  - 아래 그 밖의 API 패턴에서 다시 설명
+- 컬렉션 하위의 단일 리소스에 대한 URL / 위 기술 블로그와 관계 없음, 별도로 추가한 내용
+  - /\[collection 이름\]/\[단일 리소스 식별자\(ex. id\)\] 로 표현
+- 리소스 간 연관 관계 있는 경우의 URL\(서브 리소스\)
+  - 서브 리소스로 표현하는 방법(has 관계를 묵시적으로 표현)
+    - ex. open-api.marine.com/order-items/{:id}/reviews
+  - 서브 리소스에 관계를 명시하는 방법(관계가 복잡한 경우)
+    - ex. open-api.marine.com/users/{:id}/likes/items
+
+#### 그 밖의 API 패턴
+- 조직의 규칙에 따라 정하면 된다. 아래는 주로 Microsoft REST API Guidelines [GitHub microsoft/api-guidelines 리포지토리](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md) 중 Azure의 가이드라인을 참고한 내용이다.
+- POST 외의 복잡한 action 작업이 필요한 경우
+  - 단일 resource에 대한 복잡한 action을 요청하는 URL 패턴 ex. https://.../<resource-collection>/<resource-id>:<action>?<input parameters>
+  - resource collection에 대한 복잡한 action을 요청하는 URL 패턴 https://.../<resource-collection>:<action>?<input parameters>
+  - Control Resoruce의 경우 동사 형태를 허용 \(Microsoft 가이드라인 내용 아님\) [트렌비 기술 블로그 - REST API란 무엇인가](https://tech.trenbe.com/2022/01/16/rest-api.html) 참고
+    - HTTP Method(GET, POST, PUT, PATCH, DELETE) 외의 function, control resource 관련 URL은 동작을 포함하는 동사 형태 이름을 허용
+    - ex. open-api.marine.com/products/{id}/duplicate
+    - ex. open-api.marine.com/orders/{id}/search
+    - 아래 Query options 부분을 보면 Microsoft 가이드라인에서는 복잡한 동작에 대해서 URL path가 아닌 query parameter를 사용하는 것을 볼 수 있다.
+    - 조직의 합의에 따라 달라질 수 있는 부분이다.
+- Collection에 대한 작업의 API 응답
+  - 추후 클라이언트가 collection의 단일 resource에 대해 작업할 수 있도록 id와 etag를 포함시킨다.
+  - 페이징된 경우 nextLink 필드에 다음 페이지의 URL 절대 경로 값을 준다.
+- Query options
+  - 합의에 따라 list operation에서 사용할 filter, orderby, skip, top, maxpagesize, select, expand 등 쿼리 파라미터를 정의하고 무엇을 의미하는지 밝힌다.
+  - \* 위 트렌비 기술 블로그 글과는 달리 복잡한 동작에 대해서는 URL path가 아닌 query parameter를 사용한 형태라고 보면 된다.
+
+#### 생각해볼 지점
+- 리소스는 구분 가능한 무엇이기만 하면 된다.
+  - 꼭 DB의 테이블 혹은 테이블의 컬럼과 일치할 필요가 없다.
+  - 예를 들어 사용자들 간의 팔로우 관계를 기록하는 follow라는 테이블에 다음의 컬럼이 있다고 가정해보자.
+    - id, following_user_id, follower_user_id
+    - following_user_id와 follower_user_id는 user 테이블과 조인하여 관계가 맺어질 예정이라고 하자.
+    - 그리고 user 테이블의 컬럼은 다음과 같다고 가정하자.
+    - id, username, password
+  - 이 때 어떤 사용자의 팔로워 목록, 팔로워 수를 얻기 위해 다음과 같은 URL을 구성할 수 있다.
+    - /users/{:userId}/followers: 어떤 사용자의 팔로워 목록 리소스
+      - follower라는 테이블은 없지만, follower라는 리소스가 존재하는 것으로 생각해볼 수 있다.
+      - 그리고 followers라는 collection이 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
+    - /users/{:userId}/follower-count: 어떤 사용자의 팔로워 수 리소스
+      - 역시 follower-count라는 테이블은 없으나 follower-count라는 리소스가 존재하는 것으로 생각해볼 수 있다.
+      - 그리고 follower-count라는 단일 리소스가 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
+- nested resource - 추후 보완 필요
+  - <https://www.moesif.com/blog/technical/api-design/REST-API-Design-Best-Practices-for-Sub-and-Nested-Resources/>
+- 인증 관련 관습적인 endpoint naming에 대한 인정(더 고민이 필요할 것 같다.)
+  - 예를 들어 회원 가입, 로그인, 로그아웃 등을 다루는 endpoint 이름을 짓는다고 해보자
+    - <https://www.reddit.com/r/node/comments/by6nmh/how_do_you_name_authentication_routes_that_follow/>
+    - 리소스를 고려하여 endpoint 이름을 지으려고 다음과 같이 설계한다고 해보자.
+      - 회원가입을 위한 endpoint: POST /users
+        - 여기까지는 괜찮다.
+      - 로그인을 위한 endpoint: GET /users?userId=blahblah1&password=blahblah2
+        - 괜찮은가? url에 credential이 그대로 노출되는데?
+        - 그 전에 로그인이라는 작업이 단순하게 users collection 중 단일 user resource를 가져오는 행위가 맞긴 한가?
+        - 그렇다면 인증이 아닌 특정 사용자의 정보를 가져오는 endpoint는 뭐라고 이름 지을 것인가? /users/{:userId}/information?
+  - 관습적인 endpoint를 인정할 필요가 있다.
+    - POST /sign-up, POST /login, POST /logout 같은 것들
+    - 리소스에 대한 고려는 잘 되지 않은 것 같지만, 이렇게 이름 짓는 것이 차라리 낫다는 생각이 든다.
+  - 만약 리소스를 굳이 고려하고 싶다면 다음과 같은 형태를 생각해볼 수 있을 것 같다.
+    - 회원 가입 POST /users, 로그인 POST /auth-tokens, 로그아웃 DELETE /auth-tokens
+    - 혹은 로그인 POST /current-user/token, 로그아웃 DELETE /current-user/token
+    - 하지만 이는 추후 살펴볼 REST 제약 조건 중 stateless 제약 조건을 위반하는 듯하다. 좀 더 고민이 필요할 것 같다.
+  - 결국 리소스를 고려하기보다는 관습을 인정하고 POST /sign-up, POST /login, POST /logout 등을 사용하는 것이 나은 선택이라 생각한다.
 
 ### HTTP 메서드 관련 명세 준수
 
@@ -246,6 +329,13 @@ render_with_liquid: false
       - 직관적으로 얘기하자면, "웹을 링크를 따라가고 폼을 작성하는 것으로 사용"하는 것을 뜻함
 
 ### 애플리케이션 상태 vs. 서버 상태
+
+### REST에 대한 흔한 생각
+- ex. <https://jindory.tistory.com/entry/Web-%EA%B9%94%EB%81%94%ED%95%9C-URI-%ED%8C%A8%ED%84%B4%EC%9D%84-%EC%9C%84%ED%95%9C-REST-Resource-Naming-Guide>
+  - 자원(Resource): URI
+  - 행위(Verb): HTTP Method
+  - 표현(Representation)
+  - 아마 쓰면서도 잘 이해가 되지 않았을 것
 
 ---
 
