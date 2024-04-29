@@ -257,18 +257,19 @@ render_with_liquid: false
 #### 생각해볼 지점
 - 리소스는 구분 가능한 무엇이기만 하면 된다.
   - 꼭 DB의 테이블 혹은 테이블의 컬럼과 일치할 필요가 없다.
-  - 예를 들어 사용자들 간의 팔로우 관계를 기록하는 follow라는 테이블에 다음의 컬럼이 있다고 가정해보자.
-    - id, following_user_id, follower_user_id
-    - following_user_id와 follower_user_id는 user 테이블과 조인하여 관계가 맺어질 예정이라고 하자.
-    - 그리고 user 테이블의 컬럼은 다음과 같다고 가정하자.
-    - id, username, password
-  - 이 때 어떤 사용자의 팔로워 목록, 팔로워 수를 얻기 위해 다음과 같은 URL을 구성할 수 있다.
-    - /users/{:userId}/followers: 어떤 사용자의 팔로워 목록 리소스
-      - follower라는 테이블은 없지만, follower라는 리소스가 존재하는 것으로 생각해볼 수 있다.
-      - 그리고 followers라는 collection이 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
-    - /users/{:userId}/follower-count: 어떤 사용자의 팔로워 수 리소스
-      - 역시 follower-count라는 테이블은 없으나 follower-count라는 리소스가 존재하는 것으로 생각해볼 수 있다.
-      - 그리고 follower-count라는 단일 리소스가 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
+  - ex. follow, user 테이블이 있는 경우의 follower, follower-count라는 리소스
+    - 사용자들 간의 팔로우 관계를 기록하는 follow라는 테이블에 다음의 컬럼이 있다고 가정해보자.
+      - id, following_user_id, follower_user_id
+      - following_user_id와 follower_user_id는 user 테이블과 join하여 관계가 맺어질 예정이라고 하자.
+    - user 테이블의 컬럼은 다음과 같다고 가정하자.
+      - id, username, password
+    - 이 때 어떤 사용자의 팔로워 목록, 팔로워 수를 얻기 위해 다음과 같은 URL을 구성할 수 있다.
+      - /users/{:userId}/followers: 어떤 사용자의 팔로워 목록 리소스
+        - follower라는 테이블은 없지만, follower라는 리소스가 존재하는 것으로 생각해볼 수 있다.
+        - 그리고 followers라는 collection이 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
+      - /users/{:userId}/follower-count: 어떤 사용자의 팔로워 수 리소스
+        - 역시 follower-count라는 테이블은 없으나 follower-count라는 리소스가 존재하는 것으로 생각해볼 수 있다.
+        - 그리고 follower-count라는 단일 리소스가 특정 단일 user의 하위 계층이 되도록 생각해볼 수 있다.
 - nested resource - 추후 보완 필요
   - <https://www.moesif.com/blog/technical/api-design/REST-API-Design-Best-Practices-for-Sub-and-Nested-Resources/>
 - 인증 관련 관습적인 endpoint naming에 대한 인정(더 고민이 필요할 것 같다.)
@@ -291,6 +292,26 @@ render_with_liquid: false
   - 결국 리소스를 고려하기보다는 관습을 인정하고 POST /sign-up, POST /login, POST /logout 등을 사용하는 것이 나은 선택이라 생각한다.
 
 ### 3-2 HTTP 메서드 관련 명세 준수
+- HTTP 명세 + 조직의 규칙에 따라 정하면 된다. 아래는 주로 Microsoft REST API Guidelines [GitHub microsoft/api-guidelines 리포지토리](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md) 중 Azure의 가이드라인을 참고한 내용이다.
+- 멱등성 관련
+  - 모든 HTTP 메서드가 멱등성을 갖도록 한다.
+  - 물론 HTTP 명세상 POST, PATCH는 멱등성을 갖지 않아도 된다.
+    - 멱등성을 갖지 않아도 된다는 것은 구현 시 멱등성을 가져도 상관 없다는 의미이다.
+  - POST가 멱등성을 갖도록 하려면 특정한 방법을 사용해야 한다. Microsoft REST API Guidelines에서는 해당 가이드라인 내의 Repeatability of requests를 참고하도록 안내하고 있다.
+- 응답 코드 관련
+  - PATCH: 리소스 관련 표현의 일부만 전송
+    - 수정하는 경우 200, 생성하는 경우 201
+  - PUT: 리소스 관련 표현의 모두를 전송
+    - 대체하는 경우 200, 생성하는 경우 201
+  - POST
+    - 새로운 리소스를 생성하는 경우 201
+    - action을 나타내는 경우 200
+  - GET
+    - 리소스 컬렉션(즉 list)를 읽는 경우 200
+    - 리소스를 읽는 경우 200
+  - DELETE
+    - 리소스를 제거 204(404로 응답하지 말 것)
+\* [RESTful 웹 API 디자인](https://learn.microsoft.com/ko-kr/azure/architecture/best-practices/api-design) - Microsoft Learn Azure 아키텍처 센터를 참고
 
 ### 3-3 하지만 로이 필딩은...
 
