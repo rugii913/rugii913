@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0 # for posts's lastmod
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@1d0e911f615a112e322369596f10ee0b95b010ae
+        uses: ruby/setup-ruby@a6e6f86333f0a2523ece813039b8b4be04560854
         #https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
         #https://docs.github.com/ko/github-ae@latest/actions/automating-builds-and-tests/building-and-testing-ruby
         with:
